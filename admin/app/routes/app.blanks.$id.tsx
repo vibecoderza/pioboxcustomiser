@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { ActionFunctionArgs, HeadersFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useActionData, useLoaderData, useNavigation, useRouteError } from "@remix-run/react";
+import { Form, useActionData, useLoaderData, useNavigation, useRouteError, useSubmit } from "@remix-run/react";
 import { boundary } from "@shopify/shopify-app-remix/server";
 import {
   Badge, Banner, BlockStack, Box, Button, Card, Checkbox, Divider, InlineGrid, InlineStack, Layout,
@@ -121,7 +121,11 @@ export default function Blank() {
   const { product, images, colours, config, studioHost, problems } = useLoaderData<typeof loader>();
   const result = useActionData<typeof action>();
   const nav = useNavigation();
+  const submit = useSubmit();
   const saving = nav.state === "submitting";
+  // The embedded frame does not scroll to the foot of a long form, so Save lives in the page
+  // header where it is always reachable.
+  const formRef = useRef<HTMLFormElement>(null);
 
   // Polaris inputs are controlled — defaultValue is ignored, so every field needs state or it
   // renders empty and a save silently blanks whatever was there before.
@@ -155,9 +159,21 @@ export default function Blank() {
       subtitle={`Blank setup · ${product.handle}`}
       backAction={{ url: "/app/blanks" }}
       titleMetadata={enabled ? <Badge tone="success">In the studio</Badge> : <Badge>Switched off</Badge>}
+      primaryAction={{
+        content: saving ? "Saving…" : "Save",
+        loading: saving,
+        // requestSubmit() fires the form's own submit path, which Remix intercepts. Passing the
+        // element to useSubmit() relies on the ref being attached and fails silently if it is not.
+        onAction: () => {
+          const f = formRef.current;
+          if (!f) return;
+          if (typeof f.requestSubmit === "function") f.requestSubmit();
+          else submit(f, { method: "post" });
+        },
+      }}
     >
       <TitleBar title={`${product.title} · blank setup`} />
-      <Form method="post">
+      <Form method="post" ref={formRef}>
         <input type="hidden" name="__colours" value={JSON.stringify(colours)} />
         <input type="hidden" name="__photos" value={JSON.stringify(photos)} />
         <input type="hidden" name="__frames" value={JSON.stringify(frames)} />
