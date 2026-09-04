@@ -94,9 +94,19 @@ from this host instead, so those theme assets are dead and can be deleted.
 ## Security
 
 A storefront has no signed-in user, so `/api/upload` is reachable by anyone who can load the
-shop. It is constrained by `ALLOWED_ORIGINS` (currently `https://8pj4gs-97.myshopify.com`), a
-content-type allow-list, a 30 MB cap, and random path suffixes. Verified: a request from an
-unlisted origin is rejected with `403 Origin not allowed`.
+shop. It is constrained by `ALLOWED_ORIGINS`, a content-type allow-list, a 30 MB cap, and
+random path suffixes. Verified: a request from an unlisted origin is rejected with
+`403 Origin not allowed`.
+
+`ALLOWED_ORIGINS` currently holds `https://www.blankd.co.za`, `https://blankd.co.za` and
+`https://8pj4gs-97.myshopify.com` (the last so theme previews from Shopify admin keep working).
+It is read at build time, so **any change needs a redeploy to take effect**. Update it with:
+
+```bash
+npx vercel env rm ALLOWED_ORIGINS production --yes
+printf 'https://a.example,https://b.example' | npx vercel env add ALLOWED_ORIGINS production
+npm run deploy
+```
 
 **Uploaded artwork is currently private** — fetching a returned Blob URL without credentials
 returns `403`. Production staff therefore cannot open artwork straight from an order. Decide
