@@ -16,10 +16,14 @@ These need your logins, so they are yours to run. In order:
    ```bash
    cd admin && npm run config:link
    ```
-   Create a new app called "Piobox Customizer" (or choose it if it exists). Then
-   `npm run dev`, pick the BLANKD store as the development store, and open the URL it prints —
-   that installs the app on the store and opens it. It will error on the database until step 3;
-   that is expected.
+   Create a new app called "Piobox Customizer" (or choose it if it exists).
+
+   This is **not** an App Store app, so ignore the "Register for the Shopify App Store" page and
+   its $19 fee — that is for public listings. Instead, in the app's settings choose
+   **Distribution → Custom distribution** and enter the store domain
+   (`8pj4gs-97.myshopify.com`). Shopify generates a private install link; open it once the app
+   is deployed (step 6) to install it on the live store. `npm run dev` only works against
+   development stores, so it is for local testing, not for installing on BLANKD.
 
 2. **Vercel project** — already created and linked: `piobox-customizer-admin`
    (`admin/.vercel/project.json`). `SCOPES` and `SHOPIFY_APP_URL` are already set on it.
@@ -47,7 +51,8 @@ These need your logins, so they are yours to run. In order:
    ```bash
    npm run deploy
    ```
-   That pushes the URL, scopes and webhooks to Shopify. Open the app from the Shopify admin sidebar.
+   That pushes the URL, scopes and webhooks to Shopify. Now open the custom-distribution install
+   link from step 1; after that the app lives in the Shopify admin sidebar.
 
 For local development after linking: `npx vercel env pull .env` gives you `DATABASE_URL`, then
 `npm run dev`.
