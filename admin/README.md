@@ -21,11 +21,8 @@ These need your logins, so they are yours to run. In order:
    that installs the app on the store and opens it. It will error on the database until step 3;
    that is expected.
 
-2. **Create the Vercel project** — from `admin/`:
-   ```bash
-   npx vercel
-   ```
-   Accept the defaults; name it `piobox-customizer-admin`.
+2. **Vercel project** — already created and linked: `piobox-customizer-admin`
+   (`admin/.vercel/project.json`). `SCOPES` and `SHOPIFY_APP_URL` are already set on it.
 
 3. **Database** — Vercel dashboard → the new project → **Storage → Create → Neon (Postgres)** →
    connect to the project. That sets `DATABASE_URL`. Sessions live here.
@@ -34,12 +31,11 @@ These need your logins, so they are yours to run. In order:
    → **Connect Project** → `piobox-customizer-admin`. The app then reads design files with OIDC;
    nothing to paste.
 
-5. **Shopify credentials on Vercel** — from Partners → the app → *Client credentials*:
+5. **Shopify credentials on Vercel** — from Partners → the app → *Client credentials*
+   (the other two variables are already set):
    ```bash
    printf '<client id>'     | npx vercel env add SHOPIFY_API_KEY production
    printf '<client secret>' | npx vercel env add SHOPIFY_API_SECRET production
-   printf 'read_orders,read_customers' | npx vercel env add SCOPES production
-   printf 'https://piobox-customizer-admin.vercel.app' | npx vercel env add SHOPIFY_APP_URL production
    ```
 
 6. **Deploy, then point Shopify at it:**

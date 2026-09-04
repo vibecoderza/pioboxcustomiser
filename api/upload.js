@@ -52,10 +52,16 @@ export default async function handler(req, res) {
 
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-  if (list.length && !originOk) return res.status(403).json({ error: "Origin not allowed" });
+  let body;
+  try { body = typeof req.body === "string" ? JSON.parse(req.body) : req.body; } catch { return res.status(400).json({ error: "Malformed JSON" }); }
+
+  // Blob's upload-completed callback is server-to-server, so it carries no Origin header. It is
+  // authenticated by its signature inside handleUploadPresigned instead; the storefront origin
+  // allow-list must not apply to it, or every completion is rejected and no upload ever logs.
+  const isCallback = body?.type === "blob.upload-completed";
+  if (!isCallback && list.length && !originOk) return res.status(403).json({ error: "Origin not allowed" });
 
   try {
-    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
     const callbackUrl = body?.payload?.callbackUrl;
     const json = await handleUploadPresigned({
       body,

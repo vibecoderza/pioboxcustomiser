@@ -219,6 +219,17 @@ instead of quietly charging a different number. Change one, change the other.
 or the Vercel URLs are unreachable), or add-to-cart errors (a ladder/rounding mismatch, or a
 variant id that no longer exists).
 
+## Admin app
+
+`admin/` is an embedded Shopify app: it appears in the Shopify admin sidebar and uses Shopify's own
+login. It lists every order that came through the studio and, per design, shows the mockups,
+artwork, preflight verdicts, size run and the price at checkout.
+
+It works off the **design record** the studio writes at checkout — `designs/<id>/design.json` in
+the Blob store, next to the files, with its URL stamped on the order as `_pc_record` — joined to
+the order by the `_pc_design_id` line-item property. Files stay private; the app signs 15-minute
+read links when a page loads. Setup and day-to-day are in [admin/README.md](admin/README.md).
+
 ## Feature parity with the reference studio
 
 Blanks search/filter and 44‑style catalog · stocked colorways · Pantone reference library with popular strip, family filters, name/code search, nearest‑match and ΔE snap · custom HSV/hex picker with eyedropper and recent colours · photo recolor (garment, cap‑only, openings/hardware protection) · front/back sides · print areas with sleeve/leg zones and named placement presets · drag, corner resize, rotate handle with snapping, pinch, scroll‑to‑scale, arrow‑key nudge, centre guides · text layers (6 fonts + custom, ink, outline, curve, spacing, inline editing) · 11 text starters + sample logo · upload PNG/JPG/WebP/SVG/GIF/PDF/AI with size and type checks · artwork preflight (resolution, background, contrast, colour count, halftone, thin lines, method fit, garment‑colour suggestion) · duplicate/flip/reset/reorder/remove with undo · up to six designs per session with duplicate/remove/undo · decoration method and quantity price breaks · notes and e‑mail · preview modal, PNG download, share link, submit hand‑off · draft autosave/restore · keyboard shortcuts (⌘D, ⌘[, ⌘]) · mobile layout.
