@@ -1,0 +1,75 @@
+{%- comment -%}
+  Piobox Customizer — product page pop-out.
+
+  Usage on the product template:
+      {% render 'piobox-customizer', product: product %}
+
+  Requires (see shopify/README.md):
+    • assets/piobox-customizer.css  and the piobox-customizer/ folder uploaded to Assets
+    • product metafield  customizer.config   (JSON)  — print photos + category
+    • shop metafield     customizer.pricing  (JSON)  — decoration price list
+    • shop metafield     customizer.ladder   (JSON)  — decoration price-ladder variant map
+{%- endcomment -%}
+
+{%- assign cfg = product.metafields.customizer.config.value -%}
+{%- if cfg == blank -%}
+  {%- comment -%} Not a customisable product: render nothing. {%- endcomment -%}
+{%- else -%}
+
+<link rel="stylesheet" href="{{ 'piobox-customizer.css' | asset_url }}" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="{{ 'piobox-customizer.css' | asset_url }}"></noscript>
+
+<button type="button" class="piobox-open button button--primary" data-piobox-open>
+  {{ cfg.buttonLabel | default: 'Design yours' }}
+</button>
+
+<div id="piobox-studio-{{ product.id }}" data-piobox-host></div>
+
+<script type="application/json" data-piobox-product>{{ product | json }}</script>
+<script type="application/json" data-piobox-config>{{ cfg | json }}</script>
+<script type="application/json" data-piobox-pricing>{{ shop.metafields.customizer.pricing.value | json }}</script>
+<script type="application/json" data-piobox-ladder>{{ shop.metafields.customizer.ladder.value | json }}</script>
+
+<script type="module">
+  import { mount } from "{{ 'piobox-customizer.js' | asset_url }}";
+  import { productFromShopify, createShopifyCart } from "{{ 'piobox-shopify-adapter.js' | asset_url }}";
+
+  const read = (sel) => { try { return JSON.parse(document.querySelector(sel).textContent); } catch { return null; } };
+  const shopifyProduct = read("[data-piobox-product]");
+  const config  = read("[data-piobox-config]")  || {};
+  const pricing = read("[data-piobox-pricing]") || {};
+  const ladder  = read("[data-piobox-ladder]")  || null;
+
+  // Photos are Shopify Files/Assets URLs; the adapter passes them straight through.
+  const product = productFromShopify(shopifyProduct, config);
+
+  const studio = mount(document.querySelector("[data-piobox-host]"), {
+    products: [product],
+    photoBase: "{{ 'x.png' | asset_url | split: 'x.png' | first }}",
+    fontBase:  "{{ 'x.png' | asset_url | split: 'x.png' | first }}fonts",
+    modal: true,
+    mode: "cart",
+    pricing: { ...pricing, roundUnitTo: ladder ? (ladder.step || 25) : 0 },
+    labels: { addToCart: "{{ 'products.product.add_to_cart' | t | default: 'Add to cart' }}" },
+    onSubmit: createShopifyCart({
+      strategy: "{{ cfg.cartStrategy | default: 'line-items' }}",
+      root: "{{ routes.root_url | strip_slash }}",
+      ladder,
+      uploadEndpoint: {{ cfg.uploadEndpoint | default: shop.metafields.customizer.upload_endpoint | json }},
+      onAdded: ({ cart }) => {
+        studio.close();
+        // Most themes listen for one of these; otherwise fall back to the cart page.
+        document.dispatchEvent(new CustomEvent("cart:refresh", { bubbles: true }));
+        document.dispatchEvent(new CustomEvent("cart:build"));
+        if (!document.querySelector("cart-drawer, cart-notification")) window.location.href = "{{ routes.cart_url }}";
+      },
+    }),
+  });
+
+  document.querySelectorAll("[data-piobox-open]").forEach((b) => b.addEventListener("click", () => studio.open()));
+
+  // Deep link: /products/tee?customise=1 opens the studio straight away.
+  if (new URLSearchParams(location.search).has("customise")) studio.open();
+</script>
+
+{%- endif -%}

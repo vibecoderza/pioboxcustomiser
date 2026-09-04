@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Piobox Customizer · Shopify pop-out demo</title>
+<link rel="stylesheet" href="piobox-customizer/customizer.css?v=1788432013" />
+<style>
+  :root { --bg:#fefcf9; --fg:#101418; --muted:#50565c; --border:#e1e3e5; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:.9375rem;line-height:1.6;-webkit-font-smoothing:antialiased}
+  header{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;height:4rem;padding:0 1.5rem;background:rgba(254,252,249,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(225,227,229,.6)}
+  .brand{font-size:1.5rem;font-weight:700;letter-spacing:-.04em}
+  .cart-btn{display:inline-flex;align-items:center;gap:.5rem;height:2.25rem;padding:0 .9rem;border:1px solid var(--border);border-radius:.5rem;background:#fff;font-size:.8125rem;font-weight:500;cursor:pointer}
+  .cart-btn b{font-variant-numeric:tabular-nums}
+  main{max-width:78rem;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+  h1{font-size:1.75rem;font-weight:600;letter-spacing:-.02em;margin:0 0 .35rem}
+  .sub{color:var(--muted);font-size:.875rem;max-width:44rem;margin:0 0 2.5rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:1.25rem}
+  .card{border:1px solid rgba(225,227,229,.7);border-radius:.875rem;background:#fff;overflow:hidden;display:flex;flex-direction:column}
+  .card__img{aspect-ratio:1;background:#fff;display:grid;place-items:center;padding:1rem}
+  .card__img img{max-width:100%;max-height:100%;object-fit:contain}
+  .card__body{padding:.875rem 1rem 1rem;display:flex;flex-direction:column;gap:.5rem;flex:1}
+  .card__title{font-weight:600;font-size:.9375rem;letter-spacing:-.01em}
+  .card__meta{font-family:"Geist Mono",ui-monospace,Menlo,monospace;font-size:.6875rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  .card__price{font-weight:600;font-variant-numeric:tabular-nums}
+  .card__cta{margin-top:auto;height:2.5rem;border-radius:.5rem;border:0;background:#11161d;color:#fcfcfc;font-weight:500;font-size:.8125rem;cursor:pointer}
+  .card__cta:hover{background:#232a33}
+  .drawer{position:fixed;inset:0;z-index:70;display:none}
+  .drawer[open]{display:block}
+  .drawer__bd{position:absolute;inset:0;background:rgba(16,20,24,.5)}
+  .drawer__panel{position:absolute;top:0;right:0;bottom:0;width:min(26rem,100%);background:#fff;padding:1.5rem;overflow:auto;box-shadow:-20px 0 60px -30px rgba(0,0,0,.5)}
+  .drawer h2{margin:0 0 1rem;font-size:1.0625rem}
+  .li{display:grid;grid-template-columns:3.5rem 1fr auto;gap:.75rem;padding:.75rem 0;border-bottom:1px solid var(--border);align-items:start}
+  .li img{width:3.5rem;height:3.5rem;object-fit:contain;background:#fafafa;border-radius:.375rem}
+  .li__t{font-size:.8125rem;font-weight:600}
+  .li__p{font-size:.6875rem;color:var(--muted);word-break:break-word}
+  .li__vis{font-size:.6875rem;color:var(--fg);word-break:break-word;margin:.15rem 0}
+  .li__vis b{font-weight:600}
+  .li__x{font-variant-numeric:tabular-nums;font-size:.8125rem;font-weight:600}
+  .tot{display:flex;justify-content:space-between;padding-top:1rem;font-weight:600;font-size:1.0625rem}
+  .note{margin-top:1rem;font-size:.75rem;color:var(--muted);background:#f4f3f0;border-radius:.5rem;padding:.75rem}
+  .drawer__close{position:absolute;top:1rem;right:1rem;border:0;background:none;font-size:1.25rem;cursor:pointer;line-height:1}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">piobox<sup style="font-size:.5rem;vertical-align:super">®</sup></span>
+  <button class="cart-btn" id="cartBtn">Cart <b id="cartCount">0</b> · <b id="cartTotal">R0.00</b></button>
+</header>
+
+<main>
+  <h1>Shop</h1>
+  <p class="sub">A stand-in Shopify storefront. Each card holds a product in Shopify's own JSON shape plus a <code>customizer.config</code> metafield. “Customise” opens the studio as a pop-out, preloaded with that product, its colourways, its sizes and its variant prices. Adding to cart runs the real adapter against a mock <code>/cart/add.js</code>.</p>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div class="drawer" id="drawer">
+  <div class="drawer__bd" data-close></div>
+  <div class="drawer__panel">
+    <button class="drawer__close" data-close aria-label="Close cart">×</button>
+    <h2>Cart</h2>
+    <div id="cartLines"></div>
+    <div class="tot"><span>Subtotal</span><span id="cartSub">R0.00</span></div>
+    <p class="note">Line items are exactly what <code>/cart/add.js</code> received. Properties prefixed with <code>_</code> are hidden from the customer but stay on the order for production.</p>
+  </div>
+</div>
+
+<div id="studio-host"></div>
+
+<script type="module">
+import { mount } from "./piobox-customizer/customizer.js";
+import { productFromShopify, createShopifyCart } from "./piobox-customizer/adapters/shopify.js";
+
+const ZAR = (m) => new Intl.NumberFormat("en-ZA",{style:"currency",currency:"ZAR"}).format(m/100);
+const SIZES = ["XS","S","M","L","XL","2XL"];
+let vid = 40000000000;
+
+// --- mock Shopify products (shape of /products/<handle>.js) -------------------------
+function shopifyProduct({ handle, title, colors, sizes = SIZES, price, upcharge = {} }) {
+  const variants = [];
+  for (const c of colors) for (const s of sizes)
+    variants.push({ id: ++vid, title: `${c.label} / ${s}`, options: [c.label, s], price: price + (upcharge[s] ?? 0), available: !(c.label === "Jet black" && s === "2XL"), sku: `${handle}-${c.id}-${s}`.toUpperCase() });
+  return { id: ++vid, title, handle, options: [{ name: "Colour" }, { name: "Size" }], variants, price };
+}
+
+const CATALOGUE = [
+  { shopify: shopifyProduct({ handle: "relaxed-tee", title: "Relaxed Tee", price: 0,
+      colors: [{ id: "pfd", label: "PFD White" }, { id: "jet-black", label: "Jet black" }] }),
+    config: { id: "relaxed-tee", styleNumber: "PBX-01", category: "Tees", fit: "Relaxed", fabricWeight: "185-200 GSM",
+      swatches: { "PFD White": "#f4f4f5", "Jet black": "#000000" },
+      photos: { front: "high-quality-relaxed.webp", frontMask: "high-quality-relaxed-black.webp", frontBlack: "high-quality-relaxed-black.webp", back: "relaxed-tee-back-white.webp", backBlack: "relaxed-tee-back-black.webp" },
+      colorwayImages: { "pfd-white": "high-quality-relaxed.webp", "jet-black": "high-quality-relaxed-black.webp" },
+      backColorwayImages: { "pfd-white": "relaxed-tee-back-white.webp", "jet-black": "relaxed-tee-back-black.webp" } } },
+  { shopify: shopifyProduct({ handle: "oversized-hoodie", title: "Oversized Hoodie", price: 0,
+      colors: [{ id: "pfd", label: "PFD White" }, { id: "jet-black", label: "Jet black" }] }),
+    config: { id: "oversized-hoodie", styleNumber: "PBX-05", category: "Fleece", fit: "Oversized", fabricWeight: "380 GSM",
+      swatches: { "PFD White": "#f4f4f5", "Jet black": "#000000" },
+      photos: { front: "oversized-hoodie-white-v2.webp", frontMask: "oversized-hoodie-black-v2.webp", frontBlack: "oversized-hoodie-black-v2.webp", back: "oversized-hoodie-back-white.webp", backBlack: "oversized-hoodie-back-black.webp" },
+      colorwayImages: { "pfd-white": "oversized-hoodie-white-v2.webp", "jet-black": "oversized-hoodie-black-v2.webp" },
+      backColorwayImages: { "pfd-white": "oversized-hoodie-back-white.webp", "jet-black": "oversized-hoodie-back-black.webp" } } },
+  { shopify: shopifyProduct({ handle: "six-panel-cap", title: "Classic 6-Panel Cap", price: 0, sizes: ["One size"],
+      colors: [{ id: "pfd", label: "PFD White" }, { id: "jet-black", label: "Jet black" }] }),
+    config: { id: "six-panel-cap", styleNumber: "PBX-H01", category: "Headwear", fit: "Classic", fabricWeight: "Cotton twill",
+      swatches: { "PFD White": "#f4f4f5", "Jet black": "#000000" },
+      photos: { front: "cap-white.webp", frontMask: "cap-black.webp", frontBlack: "cap-black.webp", back: "six-panel-cap-back-white.webp", backBlack: "six-panel-cap-back-black.webp" },
+      colorwayImages: { "pfd-white": "cap-white.webp", "jet-black": "cap-black.webp" },
+      backColorwayImages: { "pfd-white": "six-panel-cap-back-white.webp", "jet-black": "six-panel-cap-back-black.webp" } } },
+];
+
+const products = CATALOGUE.map((c) => productFromShopify(c.shopify, c.config));
+
+// --- mock Shopify cart --------------------------------------------------------------
+const LADDER_STEP = 25;
+const ladder = { step: LADDER_STEP, variants: Object.fromEntries(Array.from({ length: 2000 }, (_, i) => [(i + 1) * LADDER_STEP, 90000000000 + i])) };
+const cart = { items: [] };
+const origFetch = window.fetch.bind(window);
+window.fetch = async (url, opts) => {
+  if (String(url).endsWith("/cart/add.js")) {
+    const body = JSON.parse(opts.body);
+    for (const it of body.items) {
+      const v = products.flatMap((p) => p.shopify.variants).find((x) => x.id === it.id);
+      const ladderPrice = Number(Object.entries(ladder.variants).find(([, id]) => id === it.id)?.[0] ?? 0);
+      cart.items.push({ ...it, title: v ? `${products.find((p) => p.shopify.variants.includes(v)).name} — ${v.title}` : (it.properties?.Charge ?? "Branding"), price: v ? v.price : ladderPrice });
+    }
+    renderCart();
+    return new Response(JSON.stringify(cart), { status: 200, headers: { "Content-Type": "application/json" } });
+  }
+  return origFetch(url, opts);
+};
+function renderCart() {
+  const KEYS = ["design_id", "colour", "mockup URL", "print-file URL", "print-area JSON"];
+  const esc = (s) => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const sub = cart.items.reduce((n, i) => n + i.price * i.quantity, 0);
+  document.getElementById("cartCount").textContent = cart.items.reduce((n, i) => n + i.quantity, 0);
+  document.getElementById("cartTotal").textContent = ZAR(sub);
+  document.getElementById("cartSub").textContent = ZAR(sub);
+  document.getElementById("cartLines").innerHTML = cart.items.map((i) => {
+    const props = i.properties ?? {};
+    const vis = KEYS.some((k) => k in props)
+      ? KEYS.map((k) => `<div class="li__vis"><b>${k}</b>: ${esc(String(props[k] ?? "").slice(0, 500))}</div>`).join("")
+      : "";
+    const extra = Object.entries(props)
+      .filter(([k]) => !k.startsWith("_") && !KEYS.includes(k))
+      .map(([k, v]) => `${esc(k)}: ${esc(String(v).slice(0, 160))}`)
+      .join("<br>");
+    const img = props["mockup URL"] || props._pc_preview || props["_pc_mockup-front"] || "";
+    return `<div class="li">${img ? `<img src="${esc(img)}" alt="">` : "<div></div>"}<div><div class="li__t">${esc(i.title)}</div><div class="li__p">${vis}${extra ? `<br>${extra}` : ""}</div></div><div class="li__x">${i.quantity} × ${ZAR(i.price)}</div></div>`;
+  }).join("") || "<p class='li__p'>Empty.</p>";
+}
+const drawer = document.getElementById("drawer");
+document.getElementById("cartBtn").onclick = () => drawer.setAttribute("open", "");
+drawer.addEventListener("click", (e) => { if (e.target.hasAttribute("data-close")) drawer.removeAttribute("open"); });
+
+// --- the studio, mounted once as a pop-out ------------------------------------------
+const studio = mount(document.getElementById("studio-host"), {
+  products,
+  photoBase: "assets/photos",
+  fontBase: "assets/fonts",
+  sampleLogo: "assets/brand/sample-logo.svg",
+  modal: true,
+  mode: "cart",
+  persistDraft: false,
+  defaultQuantity: 1,
+  defaultMethod: "dtg",
+  // DEFAULT_PRICING is In.It Branding 2026 (ZAR). Do not round to the old 25p GBP ladder.
+  pricing: {
+    blankSellPrices: false,
+    roundUnitTo: 0,
+  },
+  labels: { addToCart: "Add to cart" },
+  onSubmit: createShopifyCart({
+    strategy: "line-items",
+    ladder,
+    uploadEndpoint: "/design-upload",
+    onAdded: ({ cart }) => { studio.close(); drawer.setAttribute("open", ""); },
+  }),
+  onEvent: (n, d) => console.debug("[customizer]", n, d),
+});
+window.studio = studio;
+
+// --- product grid --------------------------------------------------------------------
+document.getElementById("grid").innerHTML = products.map((p, i) => `
+  <article class="card">
+    <div class="card__img"><img src="assets/photos/${p.photos.front}" alt="${p.name}" loading="lazy"></div>
+    <div class="card__body">
+      <div class="card__title">${p.name}</div>
+      <div class="card__meta">${p.styleNumber} · ${p.colors.length} colours · ${p.sizes.length} sizes</div>
+      <div class="card__price">from decoration</div>
+      <button class="card__cta" data-i="${i}">Customise</button>
+    </div>
+  </article>`).join("");
+document.getElementById("grid").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-i]"); if (!btn) return;
+  studio.setProduct(products[Number(btn.dataset.i)].id);
+  studio.open();
+});
+renderCart();
+
+const openStyle = new URLSearchParams(location.search).get("style") || new URLSearchParams(location.search).get("customise");
+if (openStyle) {
+  const hit = products.find((p) =>
+    p.id === openStyle ||
+    p.shopify?.handle === openStyle ||
+    String(p.styleNumber || "").toLowerCase() === openStyle.toLowerCase()
+  );
+  if (hit) { studio.setProduct(hit.id); studio.open(); }
+}
+</script>
+</body>
+</html>

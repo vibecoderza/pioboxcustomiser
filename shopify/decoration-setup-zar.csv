@@ -1,0 +1,11 @@
+Handle,Title,Body (HTML),Vendor,Type,Published,Option1 Name,Option1 Value,Variant SKU,Variant Grams,Variant Inventory Tracker,Variant Inventory Policy,Variant Fulfillment Service,Variant Price,Variant Requires Shipping,Variant Taxable,Status
+decoration-setup,Decoration setup,One-off branding setup (screens / digitise). Not sold on its own.,Piobox,Service,FALSE,Amount,15.00,DEC-SETUP-0015,0,,continue,manual,15.00,FALSE,TRUE,active
+decoration-setup,,,,,FALSE,Amount,300.00,DEC-SETUP-0300,0,,continue,manual,300.00,FALSE,TRUE,active
+decoration-setup,,,,,FALSE,Amount,350.00,DEC-SETUP-0350,0,,continue,manual,350.00,FALSE,TRUE,active
+decoration-setup,,,,,FALSE,Amount,700.00,DEC-SETUP-0700,0,,continue,manual,700.00,FALSE,TRUE,active
+decoration-setup,,,,,FALSE,Amount,1050.00,DEC-SETUP-1050,0,,continue,manual,1050.00,FALSE,TRUE,active
+decoration-setup,,,,,FALSE,Amount,1400.00,DEC-SETUP-1400,0,,continue,manual,1400.00,FALSE,TRUE,active
+decoration-setup,,,,,FALSE,Amount,1750.00,DEC-SETUP-1750,0,,continue,manual,1750.00,FALSE,TRUE,active
+decoration-setup,,,,,FALSE,Amount,2100.00,DEC-SETUP-2100,0,,continue,manual,2100.00,FALSE,TRUE,active
+decoration-setup,,,,,FALSE,Amount,2450.00,DEC-SETUP-2450,0,,continue,manual,2450.00,FALSE,TRUE,active
+decoration-setup,,,,,FALSE,Amount,2800.00,DEC-SETUP-2800,0,,continue,manual,2800.00,FALSE,TRUE,active

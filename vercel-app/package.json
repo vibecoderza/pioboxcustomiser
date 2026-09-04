@@ -1,0 +1,22 @@
+{
+  "name": "piobox-customizer-host",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Hosts the Piobox Customizer (ES modules + fonts) and handles design-file uploads to Vercel Blob.",
+  "scripts": {
+    "sync": "node sync.mjs",
+    "build": "node build.mjs",
+    "predeploy": "node sync.mjs",
+    "deploy": "npx vercel --prod",
+    "predeploy:preview": "node sync.mjs",
+    "deploy:preview": "npx vercel",
+    "dev": "npx vercel dev"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}
