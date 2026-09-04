@@ -1,7 +1,9 @@
 # Shopify app configuration. `npm run config:link` fills in client_id and application_url
 # from the Partners dashboard; `npm run deploy` pushes scopes and webhooks back to Shopify.
 
-name = "Piobox Customizer"
+# Mirrors the released app version in the Dev Dashboard (admin-app-1.1). The app is named
+# "Blankd" there; keep that name here or a CLI deploy will rename it.
+name = "Blankd"
 client_id = "18311dc71cc6c814f5fad5cb497984d8"
 application_url = "https://piobox-customizer-admin.vercel.app"
 embedded = true
@@ -15,7 +17,7 @@ redirect_urls = ["https://piobox-customizer-admin.vercel.app/auth/callback"]
 scopes = "read_orders,read_customers"
 
 [webhooks]
-api_version = "2025-01"
+api_version = "2026-07"
 
   [[webhooks.subscriptions]]
   uri = "/webhooks/app/uninstalled"

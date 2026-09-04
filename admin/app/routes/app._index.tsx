@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import { Badge, Card, EmptyState, IndexTable, Layout, Page, Text } from "@shopify/polaris";
+import { Badge, BlockStack, Box, Card, IndexTable, Layout, Page, Text } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { designIdsFromLineItems } from "../lib/records.server";
@@ -69,9 +69,17 @@ export default function Orders() {
         <Layout.Section>
           <Card padding="0">
             {orders.length === 0 ? (
-              <EmptyState heading="No customizer orders yet" image="">
-                <p>Orders placed through the design studio will appear here with their designs attached.</p>
-              </EmptyState>
+              // Polaris EmptyState needs a real illustration URL; with none to hand, plain
+              // content is better than a component that renders as a blank card.
+              <Box padding="800">
+                <BlockStack gap="200" inlineAlign="center">
+                  <Text as="h2" variant="headingMd">No customizer orders yet</Text>
+                  <Text as="p" tone="subdued" alignment="center">
+                    Orders placed through the design studio appear here with their mockups, artwork and
+                    preflight results attached. Designs added to a cart but not checked out do not count.
+                  </Text>
+                </BlockStack>
+              </Box>
             ) : (
               <IndexTable
                 resourceName={{ singular: "order", plural: "orders" }}
