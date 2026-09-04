@@ -18,7 +18,13 @@ piobox-customizer/
 assets/photos/                 product photography used by the default catalog
 assets/fonts/                  the six built‑in typefaces (woff2)
 assets/brand/sample-logo.svg   sample artwork for the "Start from" row
+api/                           serverless: /api/upload (artwork → Blob), /api/health
+src/uploader.js                browser-side uploader bundled for the storefront
+build.mjs                      esbuild → public/ (what Vercel serves)
+vercel.json                    Vercel project config; repo root IS the project root
+shopify/snippets/              the one file that goes into the Shopify theme
 docs/UX-REVIEW.md              review of the original fonts/design/layout + what changed
+docs/vercel-hosting.md         deploying, uploads, and why builds are configured as they are
 ```
 
 > **Photography note.** The 143 photos in `assets/photos` were pulled from blankup.org so the demo is fully functional on day one. They are that studio's product photography and must be replaced with your own before anything goes live. The catalog schema below tells you what to shoot.
@@ -161,6 +167,50 @@ run priced off real variants (so 2XL upcharges are correct), decoration priced p
 location with ink colours counted from the artwork itself, setup fees, quantity-break nudges,
 and a live total that matches the cart to the penny. `modal: true` turns the whole studio into
 a pop-out opened with `studio.open()`. See [shopify/README.md](shopify/README.md).
+
+## How the live Shopify store is wired
+
+Read this before changing themes, or when something on the storefront stops working.
+
+```
+  THIS REPO ─── npm run deploy ──▶  piobox-customizer.vercel.app
+                                     ├── /piobox-customizer/*.js|css   the studio
+                                     ├── /assets/fonts/*.woff2          the six typefaces
+                                     └── /api/upload                    artwork → Blob storage
+                                                    ▲
+                                                    │ imported at runtime
+  SHOPIFY ──── snippets/piobox-customizer-live.liquid
+                 ├── product JSON, colour/size options, photo URLs
+                 ├── the Decoration price ladder (variant ids)
+                 └── mounts the studio and adds to cart
+```
+
+**Everything that is code lives here and is served from Vercel.** The theme holds exactly one
+file — that snippet — plus the `custom-liquid` section on the product template that renders it.
+Nothing else of ours is in the theme.
+
+**So when you change themes**, you re-add two things and nothing else:
+
+1. Copy `shopify/snippets/piobox-customizer-live.liquid` into the new theme's `snippets/`.
+2. On the product template, add a **Custom Liquid** section containing
+   `{% render 'piobox-customizer-live', product: product %}`.
+
+There is nothing to rebuild, re-upload or re-bundle — the new theme pulls the same URLs the old
+one did. A theme change cannot make the studio go stale, because the theme never held a copy.
+
+**Things in the snippet that are store-specific** and will need updating if you rebuild the
+catalogue: the `data-piobox-ladder` variant ids (the Decoration product), `setupVariants` (the
+Setup product), the product `handle` guard at the top, and the photo URLs in
+`data-piobox-config`. Everything else is generic.
+
+**`pricing.roundUnitTo` must match the Decoration ladder's step.** It is `100` (R1) because the
+ladder has R1 rungs. The studio rounds each charge onto a rung it can actually bill, which is
+what keeps the cart equal to the quote; if a charge cannot be billed exactly the adapter throws
+instead of quietly charging a different number. Change one, change the other.
+
+**How you would know it broke:** the "Design yours" button does nothing (snippet not rendered,
+or the Vercel URLs are unreachable), or add-to-cart errors (a ladder/rounding mismatch, or a
+variant id that no longer exists).
 
 ## Feature parity with the reference studio
 

@@ -9,14 +9,11 @@ artwork bypasses Shopify's inability to carry files on a cart line.
 Live at **https://piobox-customizer.vercel.app**.
 
 ```bash
-cd vercel-app
 npm run deploy
 ```
 
-> **Always `npm run deploy`, never a bare `npx vercel --prod`.**
-> The customizer source lives one level up; `predeploy` copies it in (`sync.mjs`) before the
-> upload. A bare `npx vercel --prod` skips that step and silently ships whatever was vendored
-> last time — the deploy succeeds and the stale build goes live. See "Source of truth" below.
+Run it from the repo root. `npm run deploy` and `npx vercel --prod` are equivalent — the
+project root *is* the repo root, so the deploy uploads exactly the files the build reads.
 
 Check it: `curl https://piobox-customizer.vercel.app/api/health`.
 
@@ -81,17 +78,18 @@ You can then delete `piobox-customizer.js`, `piobox-shopify-adapter.js` and
 
 ## Source of truth
 
-The customizer source lives at `../piobox-customizer`. `sync.mjs` vendors a **copy** into this
-folder so `vercel` can upload a self-contained project, because the CLI only uploads files at
-or below its own root.
+There is **one** copy of the customizer: `piobox-customizer/` at the repo root. The Vercel
+project root is the repo root, so `build.mjs` bundles the same files the deploy uploaded.
+Nothing to sync, nothing that can drift.
 
-That copy is the one real footgun left here: nothing can detect from inside the Vercel build
-that the parent source has moved on, so a bare `npx vercel --prod` ships stale code without any
-error. `npm run deploy` is the only safe command.
+It was not always this way, and the failure was silent, so it is worth knowing why:
+`vercel-app/` used to hold a vendored copy made by a `sync.mjs` prestep. A deploy that skipped
+that step uploaded the old copy and **succeeded** — no error anywhere — which is how the live
+store spent a day serving a build with no margin logic in it. If you ever reintroduce a build
+that copies source around, make the copy fail loudly rather than quietly.
 
-There is also a **third** copy in the Shopify theme (`assets/piobox-customizer.js` et al). As
-long as the theme snippet imports via `asset_url`, that copy — not this one — is what customers
-run. Repointing the snippet at this host (see above) collapses three copies down to two.
+Historically there was also a third copy in the Shopify theme's assets. The snippet now imports
+from this host instead, so those theme assets are dead and can be deleted.
 
 ## Security
 
