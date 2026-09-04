@@ -7,7 +7,7 @@
   This snippet only supplies the product data and the cart wiring.
 {% endcomment %}
 {% if product.handle == 'relaxed-tee' %}
-<link rel="stylesheet" href="https://piobox-customizer.vercel.app/piobox-customizer/customizer.css" />
+<link rel="stylesheet" href="https://studio.blankd.co.za/piobox-customizer/customizer.css" />
 <button type="button" class="button button--primary" data-piobox-open>Design yours</button>
 <div id="piobox-studio-{{ product.id }}" data-piobox-host></div>
 <script type="application/json" data-piobox-product>{{ product | json }}</script>
@@ -16,9 +16,9 @@
 </script>
 <script type="application/json" data-piobox-ladder>{"step":100,"variants":{"100":50370250801392,"200":50370250834160,"300":50370250866928,"400":50370250899696,"500":50370250932464,"600":50370250965232,"700":50370250998000,"800":50370251030768,"900":50370251063536,"1000":50370251096304,"1100":50370251129072,"1200":50370251161840,"1300":50370251194608,"1400":50370251227376,"1500":50370251260144,"1600":50370251292912,"1700":50370251325680,"1800":50370251358448,"1900":50370251391216,"2000":50370251423984,"2100":50370251456752,"2200":50370251489520,"2300":50370251522288,"2400":50370251555056,"2500":50370251587824,"2600":50370251620592,"2700":50370251653360,"2800":50370251686128,"2900":50370251718896,"3000":50370251751664,"3100":50370251784432,"3200":50370251817200,"3300":50370251849968,"3400":50370251882736,"3500":50370251915504,"3600":50370251948272,"3700":50370251981040,"3800":50370252013808,"3900":50370252046576,"4000":50370252079344,"4100":50370252112112,"4200":50370252144880,"4300":50370252177648,"4400":50370252210416,"4500":50370252243184,"4600":50370252275952,"4700":50370252308720,"4800":50370252341488,"4900":50370252374256,"5000":50370252407024,"5100":50370252439792,"5200":50370252472560,"5300":50370252505328,"5400":50370252538096,"5500":50370252570864,"5600":50370252603632,"5700":50370252636400,"5800":50370252669168,"5900":50370252701936,"6000":50370252734704,"6100":50370252767472,"6200":50370252800240,"6300":50370252833008,"6400":50370252865776,"6500":50370252898544,"6600":50370252931312,"6700":50370252964080,"6800":50370252996848,"6900":50370253029616,"7000":50370253062384,"7100":50370253095152,"7200":50370253127920,"7300":50370253160688,"7400":50370253193456,"7500":50370253226224,"7600":50370253258992,"7700":50370253291760,"7800":50370253324528,"7900":50370253357296,"8000":50370253390064,"8100":50370253422832,"8200":50370253455600,"8300":50370253488368,"8400":50370253521136,"8500":50370253553904,"8600":50370253586672,"8700":50370253619440,"8800":50370253652208,"8900":50370253684976,"9000":50370253717744,"9100":50370253750512,"9200":50370253783280,"9300":50370253816048,"9400":50370253848816,"9500":50370253881584,"9600":50370253914352,"9700":50370253947120,"9800":50370253979888,"9900":50370254012656,"10000":50370254045424}}</script>
 <script type="module">
-  import { mount } from "https://piobox-customizer.vercel.app/piobox-customizer/customizer.js";
-  import { productFromShopify, createShopifyCart } from "https://piobox-customizer.vercel.app/piobox-customizer/shopify-adapter.js";
-  import { createVercelBlobUploader } from "https://piobox-customizer.vercel.app/piobox-customizer/uploader.js";
+  import { mount } from "https://studio.blankd.co.za/piobox-customizer/customizer.js";
+  import { productFromShopify, createShopifyCart } from "https://studio.blankd.co.za/piobox-customizer/shopify-adapter.js";
+  import { createVercelBlobUploader } from "https://studio.blankd.co.za/piobox-customizer/uploader.js";
 
   const read = (sel) => { try { return JSON.parse(document.querySelector(sel).textContent); } catch { return null; } };
   const shopifyProduct = read("[data-piobox-product]");
@@ -29,7 +29,7 @@
   const studio = mount(document.querySelector("[data-piobox-host]"), {
     products: [product],
     photoBase: "",
-    fontBase: "https://piobox-customizer.vercel.app/assets/fonts",
+    fontBase: "https://studio.blankd.co.za/assets/fonts",
     modal: true,
     mode: "cart",
     defaultQuantity: 1,
@@ -47,7 +47,7 @@
       ladder,
       setupVariants: { screen: 50370254143728, embroidery: 50370254176496 },
       uploadFiles: createVercelBlobUploader({
-        handleUploadUrl: "https://piobox-customizer.vercel.app/api/upload",
+        handleUploadUrl: "https://studio.blankd.co.za/api/upload",
       }),
       onAdded: () => {
         studio.close();

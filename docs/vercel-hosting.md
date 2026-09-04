@@ -6,7 +6,12 @@ artwork bypasses Shopify's inability to carry files on a cart line.
 
 ## Deploy
 
-Live at **https://piobox-customizer.vercel.app**.
+Live at **https://studio.blankd.co.za** (an A record for `studio` → `76.76.21.21`; the project
+also answers on its `piobox-customizer.vercel.app` URL). The theme snippet imports the custom
+domain, so the store keeps working even if the project moves off Vercel.
+
+Do not switch `blankd.co.za`'s nameservers to Vercel's — the apex and `www` point at Shopify,
+and delegating the zone would take the storefront down.
 
 ```bash
 npm run deploy
@@ -15,7 +20,7 @@ npm run deploy
 Run it from the repo root. `npm run deploy` and `npx vercel --prod` are equivalent — the
 project root *is* the repo root, so the deploy uploads exactly the files the build reads.
 
-Check it: `curl https://piobox-customizer.vercel.app/api/health`.
+Check it: `curl https://studio.blankd.co.za/api/health`.
 
 ### Keeping deploys fast
 

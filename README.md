@@ -173,7 +173,7 @@ a pop-out opened with `studio.open()`. See [shopify/README.md](shopify/README.md
 Read this before changing themes, or when something on the storefront stops working.
 
 ```
-  THIS REPO ─── npm run deploy ──▶  piobox-customizer.vercel.app
+  THIS REPO ─── npm run deploy ──▶  studio.blankd.co.za   (Vercel)
                                      ├── /piobox-customizer/*.js|css   the studio
                                      ├── /assets/fonts/*.woff2          the six typefaces
                                      └── /api/upload                    artwork → Blob storage
