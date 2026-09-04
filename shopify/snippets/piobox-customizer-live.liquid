@@ -85,6 +85,8 @@
     defaultQuantity: 1,
     defaultMethod: settings.defaultMethod || "dtg",
     persistDraft: false,
+    // Default to stocked-only: an unstocked Pantone must not be orderable at the stocked price.
+    stockedColorsOnly: settings.stockedColorsOnly !== false,
     // pricing.roundUnitTo must match the ladder's step. Both are read from the same settings
     // metafield and the ladder itself is built from the Decoration product, so they agree.
     pricing: settings.pricing,

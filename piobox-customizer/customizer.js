@@ -67,6 +67,10 @@ export function mount(host, config = {}) {
     photoFrames: { ...PHOTO_FRAMES, ...(config.photoFrames ?? {}) },
     fonts: config.fonts ?? [],
     allowFontUpload: config.allowFontUpload ?? true,
+    // Selling stocked blanks only: a Pantone or hex the supplier cannot deliver must not be
+    // orderable at the stocked price. With this on, the picker offers the product's colourways
+    // and nothing else, and anything bespoke goes through a quote instead.
+    stockedColorsOnly: config.stockedColorsOnly ?? false,
     sampleLogo: config.sampleLogo ?? null,
     draftKey: config.draftKey ?? "piobox-customizer-draft-v1",
     persistDraft: config.persistDraft ?? true,
@@ -292,7 +296,7 @@ export function mount(host, config = {}) {
     }
     const price = computePrice();
     const rows = sizeRows();
-    return { ...S, layout, activeLayer: layer, sideList, mockup, price, sizeRows: rows, sizeTotal: sizeTotal(), orderQty: orderQty(), money: (v) => formatMoney(v, cfg.pricing), mirrored: { front: false, back: false }, layerTotal: layerTotal(), quantityNumber: quantityNumber(), activeDesignIndex: Math.max(0, S.designs.findIndex((d) => d.id === S.activeDesignId)), preflightReport, contrastSuggestion, quality: layer ? estimateArtworkQuality(layer.artwork.naturalW, layer.placement.width, layer.artwork.isVector) : null };
+    return { ...S, layout, activeLayer: layer, sideList, mockup, price, sizeRows: rows, sizeTotal: sizeTotal(), orderQty: orderQty(), money: (v) => formatMoney(v, cfg.pricing), stockedColorsOnly: cfg.stockedColorsOnly, mirrored: { front: false, back: false }, layerTotal: layerTotal(), quantityNumber: quantityNumber(), activeDesignIndex: Math.max(0, S.designs.findIndex((d) => d.id === S.activeDesignId)), preflightReport, contrastSuggestion, quality: layer ? estimateArtworkQuality(layer.artwork.naturalW, layer.placement.width, layer.artwork.isVector) : null };
   }
   function render() {
     const s = view();

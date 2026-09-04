@@ -104,6 +104,20 @@ function renderColorTab(s, a) {
   const nearest = nearestByDeltaE(hex, PANTONE_COLORS);
   const codeMatch = findPantoneByCode(ui.code), codeNearest = codeMatch ? null : (resolvePantoneQuery(ui.code)?.match === "nearest" ? resolvePantoneQuery(ui.code).color : null);
   const supportsEyeDropper = typeof window !== "undefined" && "EyeDropper" in window;
+  // Stocked-only stores sell the colourways the supplier actually holds. Offering Pantone or a
+  // hex picker here would let someone order, at the stocked price, a garment nobody can make.
+  if (s.stockedColorsOnly) {
+    return h("div", { class: "pc-tabbody" },
+      h("p", { class: "pc-strong" }, "Garment color"),
+      picks.length
+        ? h("div", { class: "pc-row pc-row--wrap" }, picks.map((p) => {
+            const on = sel.kind === "stocked" && sel.color.id === p.color.id;
+            return h("button", { key: p.color.id, type: "button", class: cn("pc-pill", on && "is-active"), "aria-pressed": on, onclick: () => a.setColor({ kind: "stocked", color: p.color }) },
+              h("span", { class: "pc-dot pc-dot--lg", style: { backgroundColor: p.color.hex } }), p.label);
+          }))
+        : h("p", { class: "pc-hint" }, "No colours are stocked for this blank yet."),
+      h("p", { class: "pc-hint" }, "After a different colour? Add the Pantone code in the notes when you order and we’ll quote it — bespoke shades carry a longer lead time."));
+  }
   return h("div", { class: "pc-tabbody" },
     h("div", { class: "pc-row pc-row--between" },
       h("p", { class: "pc-strong" }, "Garment color"),
