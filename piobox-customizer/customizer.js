@@ -667,7 +667,13 @@ export function mount(host, config = {}) {
         product: { id: S.product.id, name: S.product.name, styleNumber: S.product.styleNumber, category: S.product.category },
         color: { selection: serializeSelection(S.colorSel), hex: hex(), name: selectionName(S.colorSel), label: selectionNotesLabel(S.colorSel) },
         method: S.method, quantity: qty, notes, email: S.email.trim(),
-        layers: layers.map(({ layer, side }) => ({ side, placement: layer.placement, areaLabel: placementAreaLabel(layout[side], layer.placement), text: layer.text ?? null, file: layer.artwork.file, fileName: layer.artwork.file.name, isVector: layer.artwork.isVector, naturalW: layer.artwork.naturalW, naturalH: layer.artwork.naturalH })),
+        layers: layers.map(({ layer, side }) => {
+          // Preflight is computed for the customer on screen but was never persisted; production
+          // needs the same verdict (DPI at printed size, ink count, flags) attached to the order.
+          const analysis = layer.text ? null : analyses.get(layer.artwork.url);
+          const preflight = analysis ? evaluatePreflight(analysis, { method: S.method, printedWidthIn: layer.placement.width * STAGE_INCHES, garmentHex: hex() }) : null;
+          return { side, placement: layer.placement, areaLabel: placementAreaLabel(layout[side], layer.placement), text: layer.text ?? null, file: layer.artwork.file, fileName: layer.artwork.file.name, isVector: layer.artwork.isVector, naturalW: layer.artwork.naturalW, naturalH: layer.artwork.naturalH, printedWidthIn: layer.placement.width * STAGE_INCHES, preflight };
+        }),
         fonts: usedFonts, mockups, finalPreview: final, design: serializeDesign(design(), true),
         price, sizes: sizeRows().filter((r) => r.quantity > 0), priceMethodLabel: cfg.pricing.methods[S.method]?.label ?? S.method,
         otherDesigns: S.designs.filter((d) => d.id !== S.activeDesignId).map((d) => serializeDesign(d, false)),

@@ -1,0 +1,22 @@
+# Shopify app configuration. `npm run config:link` fills in client_id and application_url
+# from the Partners dashboard; `npm run deploy` pushes scopes and webhooks back to Shopify.
+
+name = "Piobox Customizer"
+client_id = ""
+embedded = true
+
+[access_scopes]
+# read_orders: list orders and their line-item properties (the design ids).
+# read_customers: name/email/phone on the order detail.
+scopes = "read_orders,read_customers"
+
+[webhooks]
+api_version = "2025-01"
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/app/uninstalled"
+  topics = ["app/uninstalled"]
+
+  [[webhooks.subscriptions]]
+  topics = ["app/scopes_update"]
+  uri = "/webhooks/app/scopes_update"

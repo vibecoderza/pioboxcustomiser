@@ -3,7 +3,8 @@ public
 node_modules
 *.map
 
-# Not needed to serve the studio.
+# Not needed to serve the studio. admin/ is its own Vercel project.
+admin
 designs
 docs
 shopify

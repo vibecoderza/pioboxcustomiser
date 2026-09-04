@@ -32,8 +32,48 @@ export function createVercelBlobUploader({ handleUploadUrl = "/api/upload", onPr
       files[job.field] = blob.url;
       onProgress?.(++done, jobs.length, job.field);
     }
+
+    // Line-item properties only carry a few strings; the full design — placements, preflight,
+    // price breakdown, size run, where every file went — is written next to the files so the
+    // admin can rebuild the order from the design id alone.
+    const record = designRecord(payload, files, designId);
+    const rec = await uploadPresigned(`designs/${designId}/design.json`,
+      new File([JSON.stringify(record)], "design.json", { type: "application/json" }),
+      { access: "public", handleUploadUrl, clientPayload: JSON.stringify({ designId, field: "design" }) });
+    files.design = rec.url;
     return files;
   };
+}
+
+// Strips File/Blob objects so the record is pure JSON; everything else is already plain data.
+const plain = (v) => JSON.parse(JSON.stringify(v, (_, x) => (typeof Blob !== "undefined" && x instanceof Blob ? undefined : x)));
+
+function designRecord(payload, files, designId) {
+  return plain({
+    version: 1,
+    designId,
+    createdAt: new Date().toISOString(),
+    product: payload.product,
+    color: payload.color,
+    method: payload.method,
+    methodLabel: payload.priceMethodLabel ?? payload.method,
+    quantity: payload.quantity,
+    sizes: payload.sizes,
+    price: payload.price,
+    notes: payload.notes,
+    email: payload.email,
+    layers: payload.layers.map((l, i) => ({
+      side: l.side, placement: l.placement, areaLabel: l.areaLabel, printedWidthIn: l.printedWidthIn ?? null,
+      text: l.text, fileName: l.fileName, isVector: l.isVector, naturalW: l.naturalW, naturalH: l.naturalH,
+      preflight: l.preflight ?? null,
+      url: files[`art-${i}`] ?? null,
+    })),
+    fonts: payload.fonts.map((f, i) => ({ name: f.name, type: f.type, url: files[`font-${i}`] ?? null })),
+    mockups: payload.mockups.map((m) => ({ side: m.side, label: m.label, url: files[`mockup-${m.side}`] ?? null })),
+    preview: files.preview ?? null,
+    design: payload.design,
+    storefront: { origin: location.origin, page: location.href, userAgent: navigator.userAgent },
+  });
 }
 
 function dataUrlToFile(dataUrl, name, type) {

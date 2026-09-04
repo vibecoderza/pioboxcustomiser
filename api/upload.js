@@ -15,8 +15,13 @@ const ALLOWED_CONTENT_TYPES = [
   "image/png", "image/jpeg", "image/webp", "image/svg+xml", "image/gif",
   "application/pdf", "application/postscript",
   "font/woff2", "font/woff", "font/ttf", "font/otf",
+  "application/json",
   "application/octet-stream",
 ];
+
+// The design record must live at a path the admin can derive from the design id alone
+// (designs/<id>/design.json), so it gets no random suffix. A retried submit may rewrite it.
+const isRecord = (pathname) => pathname.endsWith("/design.json");
 const MAX_BYTES = 30 * 1024 * 1024;
 const TOKEN_TTL_MS = 60 * 60 * 1000;
 
@@ -51,6 +56,7 @@ export default async function handler(req, res) {
 
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    const callbackUrl = body?.payload?.callbackUrl;
     const json = await handleUploadPresigned({
       body,
       request: toWebRequest(req, body),
@@ -70,10 +76,14 @@ export default async function handler(req, res) {
           urlOptions: {
             allowedContentTypes: ALLOWED_CONTENT_TYPES,
             maximumSizeInBytes: MAX_BYTES,
-            addRandomSuffix: true,
-            allowOverwrite: false,
+            addRandomSuffix: !isRecord(pathname),
+            allowOverwrite: isRecord(pathname),
             validUntil: Date.now() + 10 * 60 * 1000,
-            tokenPayload: JSON.stringify({ designId: payload.designId ?? null, field: payload.field ?? null, origin }),
+            // The completion callback only fires when it is declared here, nested — a top-level
+            // tokenPayload is silently ignored, which is why no upload ever logged before.
+            ...(typeof callbackUrl === "string" && callbackUrl.startsWith("https://")
+              ? { onUploadCompleted: { callbackUrl, tokenPayload: JSON.stringify({ designId: payload.designId ?? null, field: payload.field ?? null, origin }) } }
+              : {}),
           },
         };
       },

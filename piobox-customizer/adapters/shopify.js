@@ -192,6 +192,8 @@ export function createShopifyCart(options = {}) {
     const baseProps = {
       _pc_design_id: designId,
       design_id: designId,
+      // Where the full design record was written. Underscore-prefixed so the storefront hides it.
+      ...(filesObj.design ? { _pc_record: filesObj.design } : {}),
       colour: payload.color.name,
       Colour: payload.color.name,
       "mockup URL": mockupUrl,
