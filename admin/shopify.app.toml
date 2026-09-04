@@ -2,8 +2,12 @@
 # from the Partners dashboard; `npm run deploy` pushes scopes and webhooks back to Shopify.
 
 name = "Piobox Customizer"
-client_id = ""
+client_id = "18311dc71cc6c814f5fad5cb497984d8"
+application_url = "https://piobox-customizer-admin.vercel.app"
 embedded = true
+
+[auth]
+redirect_urls = ["https://piobox-customizer-admin.vercel.app/auth/callback"]
 
 [access_scopes]
 # read_orders: list orders and their line-item properties (the design ids).

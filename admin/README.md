@@ -35,22 +35,19 @@ These need your logins, so they are yours to run. In order:
    → **Connect Project** → `piobox-customizer-admin`. The app then reads design files with OIDC;
    nothing to paste.
 
-5. **Shopify credentials on Vercel** — from Partners → the app → *Client credentials*
-   (the other two variables are already set):
+5. **Client secret on Vercel** — from Partners → the app → *Client credentials*
+   (`SHOPIFY_API_KEY`, `SCOPES` and `SHOPIFY_APP_URL` are already set):
    ```bash
-   printf '<client id>'     | npx vercel env add SHOPIFY_API_KEY production
    printf '<client secret>' | npx vercel env add SHOPIFY_API_SECRET production
    ```
 
-6. **Deploy, then point Shopify at it:**
+6. **Deploy, then push the config to Shopify:**
    ```bash
    npx vercel --prod
-   ```
-   Put the same URL into `application_url` in `shopify.app.toml`, and add
-   `https://piobox-customizer-admin.vercel.app/auth/callback` to `[auth] redirect_urls`, then:
-   ```bash
    npm run deploy
    ```
+   `shopify.app.toml` already carries the client id, `application_url` and the auth redirect;
+   `npm run deploy` sends those plus scopes and webhooks to Shopify.
    That pushes the URL, scopes and webhooks to Shopify. Now open the custom-distribution install
    link from step 1; after that the app lives in the Shopify admin sidebar.
 
