@@ -14,7 +14,9 @@ redirect_urls = ["https://piobox-customizer-admin.vercel.app/auth/callback"]
 [access_scopes]
 # read_orders: list orders and their line-item properties (the design ids).
 # read_customers: name/email/phone on the order detail.
-scopes = "read_orders,read_customers"
+# read_products/write_products: read a blank's images, options and variants, and write its
+#   piobox.customizer metafield from the Blanks screen.
+scopes = "read_orders,read_customers,read_products,write_products"
 
 [webhooks]
 api_version = "2026-07"

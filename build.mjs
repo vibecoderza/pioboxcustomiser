@@ -40,6 +40,13 @@ await build({
   entryPoints: [path.join(root, "src/uploader.js")],
   outfile: path.join(out, "piobox-customizer/uploader.js"),
 });
+// Print-zone maths on its own, so the admin app can draw exactly the areas the studio will
+// enforce. Importing the real module beats reimplementing it and letting the two drift.
+await build({
+  ...shared,
+  entryPoints: [path.join(root, "piobox-customizer/core/placements.js")],
+  outfile: path.join(out, "piobox-customizer/placements.js"),
+});
 
 await cp(path.join(root, "piobox-customizer/customizer.css"), path.join(out, "piobox-customizer/customizer.css"));
 for (const dir of ["fonts", "photos", "brand"]) {
