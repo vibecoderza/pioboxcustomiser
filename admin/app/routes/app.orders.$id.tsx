@@ -1,5 +1,6 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import type { HeadersFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData, useRouteError } from "@remix-run/react";
+import { boundary } from "@shopify/shopify-app-remix/server";
 import {
   Badge, BlockStack, Box, Button, Card, DataTable, Divider, InlineGrid, InlineStack, Layout, Page, Text, Thumbnail,
 } from "@shopify/polaris";
@@ -41,8 +42,17 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       return { id, record: record ? await signRecordFiles(record) : null };
     }),
   );
+  for (const d of designs) if (!d.record) console.warn("design record missing", d.id);
   return { order, designs };
 };
+
+// Without this the route's own render errors bubble to the parent boundary and can paint an
+// empty frame, which is indistinguishable from "loaded but blank".
+export function ErrorBoundary() {
+  return boundary.error(useRouteError());
+}
+
+export const headers: HeadersFunction = (headersArgs) => boundary.headers(headersArgs);
 
 const fmt = (amount: number | string, currency: string) =>
   new Intl.NumberFormat("en-ZA", { style: "currency", currency }).format(typeof amount === "string" ? Number(amount) : amount / 100);
