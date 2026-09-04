@@ -203,6 +203,13 @@ catalogue: the `data-piobox-ladder` variant ids (the Decoration product), `setup
 Setup product), the product `handle` guard at the top, and the photo URLs in
 `data-piobox-config`. Everything else is generic.
 
+**Putting a custom domain on the Shopify store breaks artwork uploads until you update
+`ALLOWED_ORIGINS`.** That Vercel env var allow-lists the storefront origin, so a new primary
+domain is rejected by `/api/upload` with `403 Origin not allowed`. The failure is partial and
+therefore easy to misread: the studio loads, pricing works, and a design with no artwork still
+adds to cart — only designs *with* artwork refuse. Change the domain and the env var together,
+then redeploy (env vars bake in at build time).
+
 **`pricing.roundUnitTo` must match the Decoration ladder's step.** It is `100` (R1) because the
 ladder has R1 rungs. The studio rounds each charge onto a rung it can actually bill, which is
 what keeps the cart equal to the quote; if a charge cannot be billed exactly the adapter throws
