@@ -40,8 +40,12 @@ export async function composeMockupPng(mockupSrc, layers, { mirrored = false, ba
       ctx.beginPath(); ctx.moveTo(70 + r, 70); ctx.arcTo(70 + w, 70, 70 + w, 180, r); ctx.arcTo(70 + w, 180, 70, 180, r); ctx.arcTo(70, 180, 70, 70, r); ctx.arcTo(70, 70, 70 + w, 70, r); ctx.closePath();
       ctx.fillStyle = "rgba(17,17,17,0.85)"; ctx.fill(); ctx.fillStyle = "#ffffff"; ctx.fillText(badge, 114, 126);
     }
-    return await new Promise((res) => canvas.toBlob(res, "image/png"));
-  } catch { return null; }
+    const blob = await new Promise((res) => canvas.toBlob(res, "image/png"));
+    // A tainted canvas yields null here rather than throwing, so say so — the order would
+    // otherwise reach production with no mockup and nothing to explain why.
+    if (!blob) console.warn("[customizer] mockup export produced no blob (canvas likely tainted by a non-CORS image)", mockupSrc);
+    return blob;
+  } catch (err) { console.warn("[customizer] mockup compose failed", err); return null; }
 }
 
 // All sides with layers, side by side, labelled. `sides`: [{ label, mockupSrc, mirrored, layers }]

@@ -13,12 +13,25 @@ export const isAcceptedArtwork = (name) => RASTER_EXTS.includes(extOf(name)) || 
 
 export class PrintFileError extends Error {}
 
+function needsCors(src) {
+  if (typeof src !== "string" || /^(data|blob):/i.test(src)) return false;
+  try { return new URL(src, location.href).origin !== location.origin; } catch { return false; }
+}
+
 export function loadImage(src) {
   return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`Failed to load ${src}`));
-    img.src = src;
+    // A cross-origin photo drawn onto a canvas taints it, and the export then yields null
+    // rather than throwing — which silently costs the order its mockup. Product photos are
+    // cross-origin whenever the studio is embedded (Shopify CDN), so request CORS, and fall
+    // back to a plain load so a host without CORS headers still renders on screen.
+    const attempt = (withCors) => {
+      const img = new Image();
+      if (withCors) img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = () => (withCors ? attempt(false) : reject(new Error(`Failed to load ${src}`)));
+      img.src = src;
+    };
+    attempt(needsCors(src));
   });
 }
 
