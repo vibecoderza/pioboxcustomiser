@@ -1,0 +1,12 @@
+# Build output — regenerated on Vercel by `npm run build`.
+public
+node_modules
+*.map
+
+# Not needed to serve the studio.
+designs
+docs
+shopify
+devserver.py
+shopify-demo.html
+piobox-ladder.json

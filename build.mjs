@@ -5,10 +5,10 @@ import { cp, mkdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 
-// Source lives one level up in the working repo, but is vendored alongside when deployed.
-const here = import.meta.dirname;
-const root = existsSync(path.join(here, "piobox-customizer")) ? here : path.resolve(here, "..");
-const out = path.resolve(import.meta.dirname, "public");
+// Repo root is both the source location and the Vercel project root, so the deployed
+// bundle is always built from the source in this commit — there is no copy to go stale.
+const root = import.meta.dirname;
+const out = path.join(root, "public");
 
 await rm(out, { recursive: true, force: true });
 await mkdir(path.join(out, "piobox-customizer"), { recursive: true });
@@ -37,7 +37,7 @@ await build({
 // Browser uploader: wraps @vercel/blob/client so the storefront needs no CDN dependency.
 await build({
   ...shared,
-  entryPoints: [path.join(import.meta.dirname, "src/uploader.js")],
+  entryPoints: [path.join(root, "src/uploader.js")],
   outfile: path.join(out, "piobox-customizer/uploader.js"),
 });
 
@@ -46,4 +46,4 @@ for (const dir of ["fonts", "photos", "brand"]) {
   const from = path.join(root, "assets", dir);
   if (existsSync(from)) await cp(from, path.join(out, "assets", dir), { recursive: true });
 }
-console.log("built -> vercel-app/public");
+console.log("built -> public");
