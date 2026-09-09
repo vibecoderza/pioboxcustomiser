@@ -72,38 +72,78 @@ export const DEFAULT_CATALOG = [
     }
   },
   {
-    "id": "mbt049-c230",
-    "name": "Drop Shoulder Tee",
-    "styleNumber": "BLNKUP-03",
+    // Catalogue item 03. id matches the Shopify handle so a design saved in the studio and a
+    // design saved on the storefront carry the same styleId. Weight is published as one number
+    // (230gsm) on every surface -- the supplier's 230-250 range is superseded, per the master.
+    "id": "drop-shoulder-box-tee",
+    "name": "Drop Shoulder Box Tee",
+    "styleNumber": "BLD-DST",
     "category": "Tees",
     "fit": "Oversized",
-    "fabricWeight": "230-250 GSM / 6.8oz",
+    "fabricWeight": "230 GSM / 6.8oz",
+    // White first: the studio opens resting on the white tee.
     "colors": [
       {
-        "id": "pfd",
-        "label": "PFD",
+        "id": "white",
+        "label": "White",
         "swatchHex": "#f4f4f5"
       },
       {
-        "id": "jet-black",
-        "label": "Jet black",
+        "id": "black",
+        "label": "Black",
         "swatchHex": "#000000"
       }
     ],
     "photos": {
-      "front": "high-quality-drop-tee.webp",
-      "frontMask": "high-quality-drop-tee-2.webp",
-      "frontBlack": "high-quality-drop-tee-2.webp",
-      "back": "drop-shoulder-tee-back-white.webp",
-      "backBlack": "drop-shoulder-tee-back-black.webp"
+      "front": "drop-shoulder-box-tee-front-white.webp",
+      "frontMask": "drop-shoulder-box-tee-front-black.webp",
+      "frontBlack": "drop-shoulder-box-tee-front-black.webp",
+      "back": "drop-shoulder-box-tee-back-white.webp",
+      "backBlack": "drop-shoulder-box-tee-back-black.webp"
     },
     "colorwayImages": {
-      "pfd": "high-quality-drop-tee.webp",
-      "jet-black": "high-quality-drop-tee-2.webp"
+      "white": "drop-shoulder-box-tee-front-white.webp",
+      "black": "drop-shoulder-box-tee-front-black.webp"
     },
     "backColorwayImages": {
-      "pfd": "drop-shoulder-tee-back-white.webp",
-      "jet-black": "drop-shoulder-tee-back-black.webp"
+      "white": "drop-shoulder-box-tee-back-white.webp",
+      "black": "drop-shoulder-box-tee-back-black.webp"
+    }
+  },
+  {
+    // Catalogue item 02. id matches the Shopify handle, same convention as drop-shoulder-box-tee.
+    "id": "classic-t-shirt",
+    "name": "Classic T-Shirt",
+    "styleNumber": "BLD-CLT",
+    "category": "Tees",
+    "fit": "Classic",
+    "fabricWeight": "185 GSM / 5.5oz",
+    "colors": [
+      {
+        "id": "white",
+        "label": "White",
+        "swatchHex": "#f4f4f5"
+      },
+      {
+        "id": "black",
+        "label": "Black",
+        "swatchHex": "#000000"
+      }
+    ],
+    "photos": {
+      "front": "classic-t-shirt-front-white.webp",
+      "frontMask": "classic-t-shirt-front-black.webp",
+      "frontBlack": "classic-t-shirt-front-black.webp",
+      "back": "classic-t-shirt-back-white.webp",
+      "backBlack": "classic-t-shirt-back-black.webp"
+    },
+    "colorwayImages": {
+      "white": "classic-t-shirt-front-white.webp",
+      "black": "classic-t-shirt-front-black.webp"
+    },
+    "backColorwayImages": {
+      "white": "classic-t-shirt-back-white.webp",
+      "black": "classic-t-shirt-back-black.webp"
     }
   },
   {

@@ -134,6 +134,34 @@ export const PHOTO_FRAMES = {
   "cy": 0.4941,
   "ar": 1
  },
+ "classic-t-shirt-back-black.webp": {
+  "w": 0.9266,
+  "h": 0.9306,
+  "cx": 0.4984,
+  "cy": 0.494,
+  "ar": 1
+ },
+ "classic-t-shirt-back-white.webp": {
+  "w": 0.9147,
+  "h": 0.9067,
+  "cx": 0.4996,
+  "cy": 0.4916,
+  "ar": 1
+ },
+ "classic-t-shirt-front-black.webp": {
+  "w": 0.9238,
+  "h": 0.9277,
+  "cx": 0.5,
+  "cy": 0.5029,
+  "ar": 1
+ },
+ "classic-t-shirt-front-white.webp": {
+  "w": 0.9092,
+  "h": 0.9062,
+  "cx": 0.4966,
+  "cy": 0.4971,
+  "ar": 1
+ },
  "clear-water-bottle-black.webp": {
   "w": 0.2695,
   "h": 0.9375,
@@ -217,6 +245,34 @@ export const PHOTO_FRAMES = {
   "cx": 0.498,
   "cy": 0.4961,
   "ar": 0.7998
+ },
+ "drop-shoulder-box-tee-back-black.webp": {
+  "w": 0.9506,
+  "h": 0.8469,
+  "cx": 0.5,
+  "cy": 0.4968,
+  "ar": 1
+ },
+ "drop-shoulder-box-tee-back-white.webp": {
+  "w": 0.9506,
+  "h": 0.8469,
+  "cx": 0.5,
+  "cy": 0.4968,
+  "ar": 1
+ },
+ "drop-shoulder-box-tee-front-black.webp": {
+  "w": 0.949,
+  "h": 0.8429,
+  "cx": 0.5,
+  "cy": 0.5004,
+  "ar": 1
+ },
+ "drop-shoulder-box-tee-front-white.webp": {
+  "w": 0.949,
+  "h": 0.8429,
+  "cx": 0.5,
+  "cy": 0.5004,
+  "ar": 1
  },
  "drop-shoulder-tee-back-black.webp": {
   "w": 0.9531,
